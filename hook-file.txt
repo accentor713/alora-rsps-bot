@@ -1,0 +1,4 @@
+<<Class65943149:397>>
+if (paramString.equals("::test")) {
+	System.out.println("Hello world!");
+}

@@ -45,6 +45,15 @@
         </execution>
     </executions>
 </plugin>
+	<plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.3.2</version>
+            <configuration>
+                <mainClass>org.iyamjeremy.alorarspsbot.App</mainClass>
+                <cleanupDaemonThreads>false</cleanupDaemonThreads>
+            </configuration>
+        </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
