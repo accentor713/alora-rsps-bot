@@ -1,9 +1,11 @@
 package org.iyamjeremy.alorarspsbot;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -57,9 +59,14 @@ public class ClientTransformer {
 			Enumeration<? extends ZipEntry> entries = clientJar.entries();
 			while (entries.hasMoreElements()) {
 				ZipEntry entry = entries.nextElement();
-				byte[] bytes = new byte[(int) entry.getSize()];
+				ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
 				try {
-					clientJar.getInputStream(entry).read(bytes);
+					InputStream in = clientJar.getInputStream(entry);
+					byte[] b = new byte[1];
+					while (in.read(b, 0, 1) != -1) {
+						bytesOut.write(b);
+					}
+					byte[] bytes = bytesOut.toByteArray();
 					if (entry.getName().endsWith(".class")) {
 						String className = entry.getName().replace("/", ".").substring(0, entry.getName().length()-".class".length());
 						ClassPool cp = ClassPool.getDefault();
