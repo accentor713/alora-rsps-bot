@@ -1,4 +1,7 @@
-<<Class65943149:397>>
-if (paramString.equals("::test")) {
+//just mimic the loader by downloading and unzipping the client (copy loader code)
+
+::insert:MJ:I(java.lang.String):292
+System.out.println($1);
+if ($1.equals("::test")) {
 	System.out.println("Hello world!");
 }

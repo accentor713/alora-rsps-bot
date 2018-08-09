@@ -20,13 +20,17 @@ public class Loader {
 	public void start() {
 		startUI();
 		loadHookFile();
+		ClientTransformer.transformClient(hooks);
+		frame.dispose();
+		ClientTransformer.startGame();
 	}
 	
 	private void loadHookFile() {
 		Scanner hookFileReader;
 		try {
-			hookFileReader = new Scanner(new URL("TODO").openStream());
-			String hookFileContents = hookFileReader.next("\\z");
+			hookFileReader = new Scanner(new URL("http://localhost:8080/hook-file.txt").openStream());
+			//hookFileReader = new Scanner(new URL("https://rawgit.com/i-yam-jeremy/alora-rsps-bot/master/hook-file.txt").openStream());
+			String hookFileContents = hookFileReader.useDelimiter("\\z").next();
 			this.hooks = HookFileParser.parseFile(hookFileContents);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
