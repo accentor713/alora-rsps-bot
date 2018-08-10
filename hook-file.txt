@@ -1,7 +1,132 @@
-//just mimic the loader by downloading and unzipping the client (copy loader code)
+::classInstanceTracker:IA:Entity
+::classInstanceTracker:SG:NPC
+::classInstanceTracker:RG:Player
+
+::addInterface:RG:Player
+::addMethod:RG
+public String getName() {
+	return this.Z(0);
+}
+
+::new:interface:Player
+public String getName();
+
+::addInterface:IA:Entity
+::addMethod:IA
+public int getX() {
+	return this.x;
+}
+
+::addMethod:IA
+public int getY() {
+	return this.x;
+}
+
+::new:interface:Entity
+public int getX();
+public int getY();
+
+
+
+::addInterface:SG:NPC
+::addMethod:SG
+public String getName() {
+	if (this.dI != null) {
+		return this.dI.N;
+	}
+	return "<NO-NPC-DEFINITION>";
+}
+
+::addMethod:SG
+public String[] getOptions() {
+	return this.dI.J;
+}
+
+::new:interface:NPC
+public String getName();
+public String[] getOptions();
+
+::new:class:Bot
+
+::addMethod:Bot
+public static Player getLocalPlayer() {
+	return (Player)NS.j;
+}
+
+::addMethod:Bot
+public static java.util.List getPlayers() {
+	return RG.instances;
+}
+
+::addMethod:Bot
+public static java.util.List getNPCs() {
+	return SG.instances;
+}
+
+::addMethod:Bot
+public static void log(String s) {
+	MG.I(null, s, 0);
+}
+
+::addMethod:Bot
+public static void walkTo(int x, int y) {
+	QF.I(NS.j.x, 0, 1, false, 0, NS.j.y, 1, 0, 2, x, y);
+}
+
+::addField:Bot
+public static java.util.List globalHookMethods = new java.util.ArrayList();
+
+/*::insert::AZ:I(AG,int,int,int,int)
+System.out.println($1.h + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5);*/
+
+::insert:MG:Z(YE)
+System.out.println("Test: " + $1.id + ", " + $1.data1 + ", " + $1.data2 + ", " + $1.data3 + ", " + $1.base + ", " + $1.option + ", " + YZ.K + ", " + BB.G);
+
+
+
+/*::insert:MG:I(int,int,int,long,java.lang.String,java.lang.String,int,int)
+System.out.println("Interaction: " + $1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8);
+*/
+
+/*::insert:VG:I(int,int,int,int,int,int,int,int,boolean,int,int,int)
+System.out.println($1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8 + ", " + $9 + ", " + $10 + ", " + $11 + ", " + $12);
+*/
+
+/*::insert:QF:I(int,int,int,boolean,int,int,int,int,int,int,int)
+System.out.println($1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8 + ", " + $9 + ", " + $10 + ", " + $11);
+*/
+
+/*::insert:MA:I(int,int,int,RG):3
+System.out.println($1 + ", " + $2 + ", " + $3 + ", " + ((Player)$4).getName());*/
 
 ::insert:MJ:I(java.lang.String):292
 System.out.println($1);
 if ($1.equals("::test")) {
-	System.out.println("Hello world!");
+	java.util.List npcs = Bot.getNPCs();
+	for (int i = 0; i < npcs.size(); i++) {
+		NPC npc = (NPC)npcs.get(i);
+		Bot.log(npc.getName());
+	}
 }
+if ($1.equals("::t")) {
+	Bot.log(Bot.getLocalPlayer().getName());
+}
+if ($1.startsWith("::w")) {
+	String[] split = $1.split(" ");
+	int x = Integer.parseInt(split[1]);
+	int y = Integer.parseInt(split[2]);
+	Bot.walkTo(x, y);
+}
+
+if ($1.startsWith("::p")) {
+	int i = 0;
+	int j = 0;
+	int k = 4;
+	long l = 6833;
+	String str1 = "<col=ffff00>Man<col=00ff00> (level-2)";
+	String str2 = "Pickpocket";
+	MG.I(i, j, k, l, str1, str2, 297, 244);
+}
+
+
+

@@ -30,7 +30,7 @@ public class Loader {
 		try {
 			hookFileReader = new Scanner(new URL("http://localhost:8080/hook-file.txt").openStream());
 			//hookFileReader = new Scanner(new URL("https://rawgit.com/i-yam-jeremy/alora-rsps-bot/master/hook-file.txt").openStream());
-			String hookFileContents = hookFileReader.useDelimiter("\\z").next();
+			String hookFileContents = hookFileReader.useDelimiter("\\Z").next();
 			this.hooks = HookFileParser.parseFile(hookFileContents);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
