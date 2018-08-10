@@ -49,7 +49,7 @@ public class Hook {
 
 	public void apply(CtClass cc, ClassPool cp) throws NotFoundException, CannotCompileException {
 		String action = this.attributes[0];
-		
+
 		switch (action) {
 		case "insert":
 			this.actionInsert(cc);
@@ -66,10 +66,17 @@ public class Hook {
 		case "addField":
 			this.actionAddField(cc);
 			break;
+		case "setSuper":
+			this.actionSetSuper(cc, cp);
+			break;
 		default:
 			throw new RuntimeException("Hook action invalid " + action);
 		}
 
+	}
+
+	private void actionSetSuper(CtClass cc, ClassPool cp) throws CannotCompileException, NotFoundException {
+		cc.setSuperclass(cp.get(this.attributes[2]));
 	}
 
 	private void actionAddField(CtClass cc) throws CannotCompileException {

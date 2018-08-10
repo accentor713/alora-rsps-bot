@@ -2,6 +2,9 @@
 ::classInstanceTracker:SG:NPC
 ::classInstanceTracker:RG:Player
 
+::setSuper:Player:Entity
+::setSuper:NPC:Entity
+
 ::addInterface:RG:Player
 ::addMethod:RG
 public String getName() {
@@ -39,7 +42,10 @@ public String getName() {
 
 ::addMethod:SG
 public String[] getOptions() {
-	return this.dI.J;
+	if (this.dI != null) {
+		return this.dI.J;
+	}
+	return new String[5];
 }
 
 ::addMethod:SG
@@ -49,7 +55,10 @@ public int getCombatLevel() {
 
 ::addMethod:SG
 public int getId() {
-	return this.dI.Y;
+	if (this.dI != null) {
+		return this.dI.Y;
+	}
+	return -1;
 }
 
 ::addMethod:SG
@@ -84,6 +93,17 @@ public int getIndex() {
 	return -1;
 }
 
+::addMethod:SG
+public void doAction(String action) {
+	int i = 0;
+	int j = 0;
+	int k = 4;
+	long l = this.getIndex();
+	String str1 = "";//"<col=ffff00>Man<col=00ff00> (level-2)";
+	String str2 = action;
+	MG.I(i, j, k, l, str1, str2, 297, 244);
+}
+
 
 ::new:interface:NPC
 public String getName();
@@ -92,6 +112,7 @@ public int getCombatLevel();
 public int getId();
 public void printFields();
 public int getIndex();
+public void doAction(String action);
 
 ::new:class:Bot
 
@@ -120,30 +141,32 @@ public static void walkTo(int x, int y) {
 	QF.I(NS.j.x, 0, 1, false, 0, NS.j.y, 1, 0, 2, x, y);
 }
 
+::addMethod:Bot
+public static NPC getNearestNPC(int[] ids) {
+	NPC nearest = null;
+	float nearestDistance = Float.MAX_VALUE;
+	Player localPlayer = Bot.getLocalPlayer();
+	java.util.List npcs = Bot.getNPCs();
+	for (int i = 0; i < npcs.size(); i++) {
+		NPC npc = (NPC)npcs.get(i);
+		for (int j = 0; j < ids.length; j++) {
+			int id = ids[j];
+			if (npc.getId() == id) {
+				int dx = npc.getX() - localPlayer.getX();
+				int dy = npc.getY() - localPlayer.getY();
+				float distance = (float)Math.sqrt((double)(dx*dx + dy*dy));
+				if (distance < nearestDistance) {
+					nearest = npc;
+					nearestDistance = distance;
+				}
+			}
+		}
+	}
+	return nearest;
+}
+
 ::addField:Bot
 public static java.util.List globalHookMethods = new java.util.ArrayList();
-
-/*::insert::AZ:I(AG,int,int,int,int)
-System.out.println($1.h + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5);*/
-
-/*::insert:MG:Z(YE)
-System.out.println("Test: " + $1.id + ", " + $1.data1 + ", " + $1.data2 + ", " + $1.data3 + ", " + $1.base + ", " + $1.option + ", " + YZ.K + ", " + BB.G);
-*/
-
-/*::insert:MG:I(int,int,int,long,java.lang.String,java.lang.String,int,int)
-System.out.println("Interaction: " + $1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8);
-*/
-
-/*::insert:VG:I(int,int,int,int,int,int,int,int,boolean,int,int,int)
-System.out.println($1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8 + ", " + $9 + ", " + $10 + ", " + $11 + ", " + $12);
-*/
-
-/*::insert:QF:I(int,int,int,boolean,int,int,int,int,int,int,int)
-System.out.println($1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8 + ", " + $9 + ", " + $10 + ", " + $11);
-*/
-
-/*::insert:MA:I(int,int,int,RG):3
-System.out.println($1 + ", " + $2 + ", " + $3 + ", " + ((Player)$4).getName());*/
 
 ::insert:MJ:I(java.lang.String):292
 System.out.println($1);
@@ -151,9 +174,7 @@ if ($1.equals("::test")) {
 	java.util.List npcs = Bot.getNPCs();
 	for (int i = 0; i < npcs.size(); i++) {
 		NPC npc = (NPC)npcs.get(i);
-		System.out.println(npc.getName());
-		npc.printFields();
-		//Bot.log(npc.getName() + ": " + npc.getId());
+		Bot.log(npc.getName() + ": " + npc.getId());
 	}
 }
 if ($1.equals("::b")) {
@@ -172,6 +193,13 @@ if ($1.equals("::a")) {
 	Bot.log("" + XZ.D);
 	for (int i = 0; i < XZ.D; i++) {
 		Bot.log("> " + HZ.B[i]);
+	}
+}
+if ($1.equals("::ba")) {
+	int[] bankerIds = new int[]{395, 400};
+	NPC banker = Bot.getNearestNPC(bankerIds);
+	if (banker != null) {
+		banker.doAction("Bank");
 	}
 }
 if ($1.startsWith("::w")) {
