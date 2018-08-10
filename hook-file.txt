@@ -42,9 +42,56 @@ public String[] getOptions() {
 	return this.dI.J;
 }
 
+::addMethod:SG
+public int getCombatLevel() {
+	return this.S;
+}
+
+::addMethod:SG
+public int getId() {
+	return this.dI.Y;
+}
+
+::addMethod:SG
+public void printFields() {
+	java.lang.reflect.Field[] fields = IA.class.getDeclaredFields();
+	for (int i = 0; i < fields.length; i++) {
+		java.lang.reflect.Field field = fields[i];
+		if (!java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
+			try {
+				field.setAccessible(true);
+				System.out.println(field.getName() + ": " + field.get(this));
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassCastException e) {
+			
+			}
+		}
+	}
+}
+
+::addMethod:SG
+public int getIndex() {
+	for (int i = 0; i < YB.H.length; i++) {
+		if (YB.H[i] == this) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+
 ::new:interface:NPC
 public String getName();
 public String[] getOptions();
+public int getCombatLevel();
+public int getId();
+public void printFields();
+public int getIndex();
 
 ::new:class:Bot
 
@@ -79,10 +126,9 @@ public static java.util.List globalHookMethods = new java.util.ArrayList();
 /*::insert::AZ:I(AG,int,int,int,int)
 System.out.println($1.h + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5);*/
 
-::insert:MG:Z(YE)
+/*::insert:MG:Z(YE)
 System.out.println("Test: " + $1.id + ", " + $1.data1 + ", " + $1.data2 + ", " + $1.data3 + ", " + $1.base + ", " + $1.option + ", " + YZ.K + ", " + BB.G);
-
-
+*/
 
 /*::insert:MG:I(int,int,int,long,java.lang.String,java.lang.String,int,int)
 System.out.println("Interaction: " + $1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8);
@@ -105,11 +151,28 @@ if ($1.equals("::test")) {
 	java.util.List npcs = Bot.getNPCs();
 	for (int i = 0; i < npcs.size(); i++) {
 		NPC npc = (NPC)npcs.get(i);
-		Bot.log(npc.getName());
+		System.out.println(npc.getName());
+		npc.printFields();
+		//Bot.log(npc.getName() + ": " + npc.getId());
+	}
+}
+if ($1.equals("::b")) {
+	java.util.List npcs = Bot.getNPCs();
+	for (int i =0; i < npcs.size(); i++) {
+		NPC npc = (NPC)npcs.get(i);
+		if (npc.getName().equals("Man")) {
+			Bot.log(":" + npc.getIndex());
+		}
 	}
 }
 if ($1.equals("::t")) {
 	Bot.log(Bot.getLocalPlayer().getName());
+}
+if ($1.equals("::a")) {
+	Bot.log("" + XZ.D);
+	for (int i = 0; i < XZ.D; i++) {
+		Bot.log("> " + HZ.B[i]);
+	}
 }
 if ($1.startsWith("::w")) {
 	String[] split = $1.split(" ");
@@ -117,7 +180,6 @@ if ($1.startsWith("::w")) {
 	int y = Integer.parseInt(split[2]);
 	Bot.walkTo(x, y);
 }
-
 if ($1.startsWith("::p")) {
 	int i = 0;
 	int j = 0;
