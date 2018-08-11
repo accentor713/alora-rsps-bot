@@ -168,39 +168,56 @@ public static NPC getNearestNPC(int[] ids) {
 ::addField:Bot
 public static java.util.List globalHookMethods = new java.util.ArrayList();
 
+::addField:Bot
+private static Thread botThread = null;
+
+::addMethod:Bot
+public static void startBot(Runnable bot) {
+	Bot.stopBot();
+	Bot.botThread = new Thread(bot);
+	Bot.botThread.start();
+}
+
+::addMethod:Bot
+public static void stopBot() {
+	if (Bot.botThread != null) {
+		Bot.botThread.interrupt();
+	}
+}
+
+::new:class:TestBot
+::addInterface:TestBot:java.lang.Runnable
+::addMethod:TestBot
+public void run() {
+	while (true) {
+		int[] bankerIds = new int[]{395, 400};
+		NPC banker = Bot.getNearestNPC(bankerIds);
+		if (banker != null) {
+			banker.doAction("Bank");
+		}
+		Thread.sleep(5000L);
+	}
+}
+
 ::insert:MJ:I(java.lang.String):292
-System.out.println($1);
-if ($1.equals("::test")) {
+if ($1.equals("::npc_ids")) {
 	java.util.List npcs = Bot.getNPCs();
 	for (int i = 0; i < npcs.size(); i++) {
 		NPC npc = (NPC)npcs.get(i);
 		Bot.log(npc.getName() + ": " + npc.getId());
 	}
 }
-if ($1.equals("::b")) {
-	java.util.List npcs = Bot.getNPCs();
-	for (int i =0; i < npcs.size(); i++) {
-		NPC npc = (NPC)npcs.get(i);
-		if (npc.getName().equals("Man")) {
-			Bot.log(":" + npc.getIndex());
-		}
-	}
-}
-if ($1.equals("::t")) {
-	Bot.log(Bot.getLocalPlayer().getName());
-}
-if ($1.equals("::a")) {
-	Bot.log("" + XZ.D);
-	for (int i = 0; i < XZ.D; i++) {
-		Bot.log("> " + HZ.B[i]);
-	}
-}
-if ($1.equals("::ba")) {
-	int[] bankerIds = new int[]{395, 400};
+
+if ($1.equals("::start_bot")) {
+	Bot.startBot((Runnable)new TestBot());
+	/*int[] bankerIds = new int[]{395, 400};
 	NPC banker = Bot.getNearestNPC(bankerIds);
 	if (banker != null) {
 		banker.doAction("Bank");
-	}
+	}*/
+}
+if ($1.equals("::stop_bot")) {
+	Bot.stopBot();
 }
 if ($1.startsWith("::w")) {
 	String[] split = $1.split(" ");
