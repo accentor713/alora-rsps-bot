@@ -1,0 +1,11 @@
+org/iyamjeremy/alorarspsbot/api/BotScriptMetadata.class
+org/iyamjeremy/alorarspsbot/api/Entity.class
+org/iyamjeremy/alorarspsbot/api/BotScript.class
+org/iyamjeremy/alorarspsbot/api/Bot.class
+org/iyamjeremy/alorarspsbot/api/Player.class
+org/iyamjeremy/alorarspsbot/api/HookFileParser.class
+org/iyamjeremy/alorarspsbot/api/InstanceWrapper.class
+org/iyamjeremy/alorarspsbot/api/Util.class
+org/iyamjeremy/alorarspsbot/api/Hook.class
+org/iyamjeremy/alorarspsbot/api/NPC.class
+org/iyamjeremy/alorarspsbot/api/NPCDefinition.class
