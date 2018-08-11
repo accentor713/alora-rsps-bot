@@ -25,9 +25,21 @@ public int getY() {
 	return this.x;
 }
 
+::addMethod:IA
+public int getHP() {
+	return this.M;
+}
+
+::addMethod:IA
+public int getMaxHP() {
+	return this.N;
+}
+
 ::new:interface:Entity
 public int getX();
 public int getY();
+public int getHP();
+public int getMaxHP();
 
 
 
@@ -97,7 +109,7 @@ public int getIndex() {
 public void doAction(String action) {
 	int i = 0;
 	int j = 0;
-	int k = 4;
+	int k = (action.equalsIgnoreCase("Attack")) ? 16 : 4; // Examine is 1007
 	long l = this.getIndex();
 	String str1 = "";//"<col=ffff00>Man<col=00ff00> (level-2)";
 	String str2 = action;
@@ -172,9 +184,9 @@ public static java.util.List globalHookMethods = new java.util.ArrayList();
 private static Thread botThread = null;
 
 ::addMethod:Bot
-public static void startBot(Runnable bot) {
+public static void startBot(BotScript bot) {
 	Bot.stopBot();
-	Bot.botThread = new Thread(bot);
+	Bot.botThread = new Thread((Runnable)bot);
 	Bot.botThread.start();
 }
 
@@ -185,19 +197,43 @@ public static void stopBot() {
 	}
 }
 
+::new:interface:BotScript
+::setSuper:BotScript:java.lang.Runnable
+
 ::new:class:TestBot
-::addInterface:TestBot:java.lang.Runnable
+::addInterface:TestBot:BotScript
+::addField:TestBot
+private int[] monsterIds;
+
+::addConstructor:TestBot
+public TestBot(String[] args) {
+	String[] idStrings = args[1].split(",");
+	this.monsterIds = new int[idStrings.length];
+	for (int i = 0; i < monsterIds.length; i++) {
+		try {
+			monsterIds[i] = Integer.parseInt(idStrings[i]);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
 ::addMethod:TestBot
 public void run() {
 	while (true) {
-		int[] bankerIds = new int[]{395, 400};
-		NPC banker = Bot.getNearestNPC(bankerIds);
-		if (banker != null) {
-			banker.doAction("Bank");
+		NPC monster = Bot.getNearestNPC(this.monsterIds);
+		if (monster != null) {
+			monster.doAction("Attack");
 		}
-		Thread.sleep(5000L);
+		while (monster.getHP() > 0) {
+			Thread.sleep(600L);
+		}
+		Thread.sleep(3000L);
 	}
 }
+
+/*::insert:NH:I(short,int,long,java.lang.String,int,java.lang.String,int,boolean)
+System.out.println($1 + ", " + $2 + ", " + $3 + ", " + $4 + ", " + $5 + ", " + $6 + ", " + $7 + ", " + $8);*/
 
 ::insert:MJ:I(java.lang.String):292
 if ($1.equals("::npc_ids")) {
@@ -208,31 +244,12 @@ if ($1.equals("::npc_ids")) {
 	}
 }
 
-if ($1.equals("::start_bot")) {
-	Bot.startBot((Runnable)new TestBot());
-	/*int[] bankerIds = new int[]{395, 400};
-	NPC banker = Bot.getNearestNPC(bankerIds);
-	if (banker != null) {
-		banker.doAction("Bank");
-	}*/
+if ($1.startsWith("::start_bot")) {
+	String[] args = $1.split(" ");
+	Bot.startBot((BotScript)new TestBot(args));
 }
 if ($1.equals("::stop_bot")) {
 	Bot.stopBot();
-}
-if ($1.startsWith("::w")) {
-	String[] split = $1.split(" ");
-	int x = Integer.parseInt(split[1]);
-	int y = Integer.parseInt(split[2]);
-	Bot.walkTo(x, y);
-}
-if ($1.startsWith("::p")) {
-	int i = 0;
-	int j = 0;
-	int k = 4;
-	long l = 6833;
-	String str1 = "<col=ffff00>Man<col=00ff00> (level-2)";
-	String str2 = "Pickpocket";
-	MG.I(i, j, k, l, str1, str2, 297, 244);
 }
 
 

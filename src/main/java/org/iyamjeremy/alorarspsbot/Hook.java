@@ -10,6 +10,7 @@ import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
+import javassist.CtNewConstructor;
 import javassist.NotFoundException;
 
 public class Hook {
@@ -66,6 +67,9 @@ public class Hook {
 		case "addField":
 			this.actionAddField(cc);
 			break;
+		case "addConstructor":
+			this.actionAddConstructor(cc);
+			break;
 		case "setSuper":
 			this.actionSetSuper(cc, cp);
 			break;
@@ -73,6 +77,10 @@ public class Hook {
 			throw new RuntimeException("Hook action invalid " + action);
 		}
 
+	}
+
+	private void actionAddConstructor(CtClass cc) throws CannotCompileException {
+		cc.addConstructor(CtNewConstructor.make(this.sourceBody, cc));
 	}
 
 	private void actionSetSuper(CtClass cc, ClassPool cp) throws CannotCompileException, NotFoundException {
