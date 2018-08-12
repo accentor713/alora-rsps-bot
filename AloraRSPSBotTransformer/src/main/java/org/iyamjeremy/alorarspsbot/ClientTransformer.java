@@ -19,6 +19,8 @@ import javassist.ByteArrayClassPath;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
@@ -110,6 +112,13 @@ public class ClientTransformer {
 								if (m.getName().equals("I") && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].getName().equals("java.lang.String")) {
 									m.insertBefore("{ if (org.iyamjeremy.alorarspsbot.api.Bot.runCommand($1)) { return; } }");
 								}
+							}
+						}
+						
+						if (cc.getName().equals("EA")) {
+							cc.addField(CtField.make("public static java.util.List instances = new java.util.ArrayList();", cc));
+							for (CtConstructor constructor : cc.getDeclaredConstructors()) {
+								constructor.insertAfter("{ instances.add(this); }");
 							}
 						}
 						

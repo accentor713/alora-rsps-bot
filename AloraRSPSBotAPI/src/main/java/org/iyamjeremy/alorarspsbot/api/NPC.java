@@ -3,35 +3,35 @@ package org.iyamjeremy.alorarspsbot.api;
 
 public class NPC extends Entity {
 	
-	private NPCDefinition npcDefinition;
+	private NPCDefinition definition;
 	
 	public NPC(Object instance) {
 		super(instance);
-		this.npcDefinition = new NPCDefinition(Bot.util.getField("NPC_CLASS", "NPC_DEF", this.getInstance()));
+		this.definition = new NPCDefinition(Bot.util.getField("NPC_CLASS", "NPC_DEF", this.getInstance()));
 	}
 	
-	public NPCDefinition getNPCDefinition() {
-		return npcDefinition;
+	public NPCDefinition getDefinition() {
+		return definition;
 	}
 	
 	public boolean isNull() {
-		return this.getNPCDefinition().getInstance() == null;
+		return this.getDefinition().getInstance() == null;
 	}
 	
 	public String getName() {
-		return this.getNPCDefinition().getName();
+		return this.getDefinition().getName();
 	}
 	
 	public String[] getOptions() {
-		return this.getNPCDefinition().getOptions();
+		return this.getDefinition().getOptions();
 	}
 	
 	public int getId() {
-		return this.getNPCDefinition().getId();
+		return this.getDefinition().getId();
 	}
 	
 	public int getCombatLevel() {
-		return this.getNPCDefinition().getCombatLevel();
+		return this.getDefinition().getCombatLevel();
 	}
 	
 	public int getIndex() {

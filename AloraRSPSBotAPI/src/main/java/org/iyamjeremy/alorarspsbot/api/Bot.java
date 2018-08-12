@@ -3,7 +3,9 @@ package org.iyamjeremy.alorarspsbot.api;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -119,6 +121,53 @@ public class Bot {
 					else {
 						Bot.log("No script currently running");
 					}
+					break;
+				case "ss":
+					for (int i = 0; i < (int)Bot.util.getField("TEST1", "TEST2", null); i++) {
+						long l3 = ((long[])Bot.util.getField("TEST3", "TEST4", null))[i];
+						int j = (int)l3 & 0x7F;
+						int i3 = ((int)l3 & 0x77C3CCF2) >> 29;
+						int i4 = (int)(l3 >>> 32) & 0x7FFFFFFF;
+						int i5 = 0x7F & (int)l3 >> 7;
+						Bot.log(j + ", " + i3 + ", " + i4 + ", " + i5);
+						Object gameObjectDef = Bot.util.callMethod("TEST5", "TEST6", new Class<?>[]{int.class}, null, new Object[]{i4});
+						String gameObjectName = (String) Bot.util.getField("GAME_OBJECT_DEF_CLASS", "GAME_OBJECT_DEF_NAME", gameObjectDef);
+						Bot.log(gameObjectName);
+					}
+					break;
+				case "dd":
+					GroundTile[][][] tiles = GroundTile.getTiles();
+					for (int x = 0; x < tiles.length; x++) { // TODO check order of x, y, z for array
+						for (int y = 0; y < tiles[x].length; y++) {
+							for (int z = 0; z < tiles[x][y].length; z++) {
+								GroundTile tile = tiles[x][y][z];
+								//if (tile.getObjectId() != 0) {
+									System.out.println("(" + x + "," + y + "," + z + "):(" + tile.getX() + "," + tile.getY() + "," + tile.getZ() + "): " + tile.getObjectId());
+								//}
+							}
+						}
+					}
+					/*List<Object> gameObjectInstances = (List<Object>) Bot.util.getField("GAME_OBJECT_CLASS", "GAME_OBJECT_INSTANCES", null);
+					for (Object obj : gameObjectInstances) {
+						GameObject gameObject = new GameObject(obj);
+						Bot.log(gameObject.getName() + ": " + gameObject.getId());
+					}*/
+//					Object list = Bot.util.getField("TEST7", "TEST8", null);
+//					Object startObject = Bot.util.callMethod("TEST9", "TEST10", new Class<?>[]{}, list, new Object[]{});
+//					for (Object localGameObject = startObject/*(GameObject)Class3_Sub13_Sub6.G.D()*/; localGameObject != null; localGameObject = Bot.util.callMethod("TEST9", "TEST11", new Class<?>[]{}, list, new Object[]{})/*(GameObject)Class3_Sub13_Sub6.G.B()*/) {
+//						System.out.println("-----------------------");
+//						try {
+//						for (Field f : Bot.util.findClass("GAME_OBJECT_CLASS").getDeclaredFields()) {
+//							f.setAccessible(true);
+//							if (!Modifier.isStatic(f.getModifiers())) {
+//								try {
+//								System.out.println(f.getName() + ": " + f.get(localGameObject));
+//								} catch (Exception e) {}
+//							}
+//						}
+//						System.out.println("-----------------------");
+//						} catch (Exception e) { e.printStackTrace(); }
+//					}
 					break;
 				default:
 					Bot.log("Unrecognized command " + cmdName);
