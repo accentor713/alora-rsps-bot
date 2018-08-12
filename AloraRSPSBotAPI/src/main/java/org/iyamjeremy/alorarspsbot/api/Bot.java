@@ -28,6 +28,14 @@ public class Bot {
 
 	private static HashMap<String, Constructor<? extends BotScript>> botScripts = new HashMap<>();
 	
+	private static HashMap<String, List<Object>> trackedInstances = new HashMap<>();
+	public static void trackInstance(String className, Object instance) {
+		if (!trackedInstances.containsKey(className)) {
+			trackedInstances.put(className, new ArrayList<>());
+		}
+		trackedInstances.get(className).add(instance);
+	}
+	
 	private static boolean loadBot(String path, String scriptClass) {
 		try {
 			ClassLoader loader = URLClassLoader.newInstance(
@@ -55,6 +63,11 @@ public class Bot {
 			String[] args = command.substring("::".length()).split(" ");
 			String cmdName = args[0];
 			switch (cmdName) {
+				case "test":
+					for (String className : trackedInstances.keySet()) {
+						System.out.println(className + ": " + trackedInstances.get(className).size());
+					}
+					break;
 				case "npcids":
 					for (NPC npc : Bot.getNPCs()) {
 						if (!npc.isNull()) {
