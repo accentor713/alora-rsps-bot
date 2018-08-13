@@ -1,12 +1,13 @@
 package org.iyamjeremy.alorarspsbot.api;
 
 
-public class GameObject extends InstanceWrapper {
+public class GameObject {
 	
 	private GameObjectDefinition definition;
+	private long hash;
 	
-	public GameObject(Object instance) {
-		super(instance);
+	public GameObject(long hash) {
+		this.hash = hash;
 		this.definition = new GameObjectDefinition(Bot.util.callMethod("GAME_OBJECT_DEF_CLASS", "GAME_OBJECT_DEF_LOAD_BY_ID", new Class<?>[]{int.class}, null, new Object[]{this.getId()})); 
 	}
 	
@@ -26,19 +27,27 @@ public class GameObject extends InstanceWrapper {
 		return this.getDefinition().getOptions();
 	}
 	
+	public long getHash() {
+		return this.hash;
+	}
+	
+	public int getX() {
+		return (int) (this.hash & 0x7F);
+	}
+	
+	public int getY() {
+		return (int) ((this.hash >> 7) & 0x7F);
+	}
+	
 	public int getId() {
-		int id = (int) Bot.util.getField("GAME_OBJECT_CLASS", "GAME_OBJECT_ID_1", this.getInstance());
-		if (id == -1) {
-			id = (int) Bot.util.getField("GAME_OBJECT_CLASS", "GAME_OBJECT_ID_2", this.getInstance());
-		}
-		return id;
+		return (int) (this.hash >>> 32 & (0x7FFFFFFF));
 	}
 	
 	public void doAction(String action) {
 		
-		/*int optionIndex = -1;
-		for (int i = 0; i < 5; this.getOptions().length; i++) {
-			if (this.getOptions()[i].equals(action)) {
+		int optionIndex = -1;
+		for (int i = 0; i < this.getOptions().length; i++) {
+			if (this.getOptions()[i] != null && this.getOptions()[i].equals(action)) {
 				optionIndex = i;
 			}
 		}
@@ -53,23 +62,17 @@ public class GameObject extends InstanceWrapper {
         int i10 = -1;
         if (2 == optionIndex)
           actionNumber = 49;
-        if (localEG.E == optionIndex)
-          i10 = localEG.d;
+        /*if (localEG.E == optionIndex)
+          i10 = localEG.d;*/
         if (-4 == (optionIndex ^ 0xFFFFFFFF))
           actionNumber = 46;
-        if (optionIndex == localEG.s)
-          i10 = localEG.e;
+        /*if (optionIndex == localEG.s)
+          i10 = localEG.e;*/
         if (-5 == (optionIndex ^ 0xFFFFFFFF))
           actionNumber = 1001;
-		int i = 0;
-		int j = 0;
-		int k = (action.equalsIgnoreCase("Attack")) ? 16 : 4; // Examine is 1007
-		long l = this.getIndex();
-		String str1 = "";//"<col=ffff00>Man<col=00ff00> (level-2)";
-		String str2 = action;
-		Object[] args = new Object[]{i, j, k, l, str1, str2, 297, 244};
+        
+		Object[] args = new Object[]{this.getX(), this.getY(), actionNumber, this.getHash(), "", action, 297, 244};
 		Bot.util.callMethod("DO_ACTION_CLASS", "DO_ACTION_METHOD", new Class<?>[]{int.class, int.class, int.class, long.class, String.class, String.class, int.class, int.class}, null, args);
-		*/
 	}
 
 }

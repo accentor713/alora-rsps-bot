@@ -29,11 +29,18 @@ public class Bot {
 	private static HashMap<String, Constructor<? extends BotScript>> botScripts = new HashMap<>();
 	
 	private static HashMap<String, List<Object>> trackedInstances = new HashMap<>();
+	
+	private static List<GameObject> gameObjects = new ArrayList<>();
+	
 	public static void trackInstance(String className, Object instance) {
 		if (!trackedInstances.containsKey(className)) {
 			trackedInstances.put(className, new ArrayList<>());
 		}
 		trackedInstances.get(className).add(instance);
+	}
+	
+	public static void trackGameObject(long hash) {
+		gameObjects.add(new GameObject(hash));
 	}
 	
 	private static boolean loadBot(String path, String scriptClass) {
@@ -63,6 +70,45 @@ public class Bot {
 			String[] args = command.substring("::".length()).split(" ");
 			String cmdName = args[0];
 			switch (cmdName) {
+				case "abc":
+					for (GameObject gameObject : gameObjects) {
+						if (gameObject.getName() != null && !gameObject.getName().equals("null")) {
+							if (gameObject.getId() == 24101) {
+								gameObject.doAction("Bank");
+							}
+						}
+					}
+					break;
+				case "search":
+					try {
+						Integer search = Integer.parseInt(args[1]);
+						for (String className : trackedInstances.keySet()) {
+							for (Object instance : trackedInstances.get(className)) {
+								for (Field f : Class.forName(className).getDeclaredFields()) {
+									f.setAccessible(true);
+									if (!Modifier.isStatic(f.getModifiers())) {
+										Object value = f.get(instance);
+										if (search.equals(value)) {
+											System.out.println(className + "." + f.getName());
+										}
+									}
+									if (f.getType().equals(int[].class)) {
+										int[] data = (int[]) f.get(instance);
+										if (data != null) {
+											for (int i = 0; i < data.length; i++) {
+												if (data[i] == search.intValue()) {
+													System.out.println(className + "." + f.getName() + "[" + i + "]");
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					break;
 				case "test":
 					for (String className : trackedInstances.keySet()) {
 						System.out.println(className + ": " + trackedInstances.get(className).size());

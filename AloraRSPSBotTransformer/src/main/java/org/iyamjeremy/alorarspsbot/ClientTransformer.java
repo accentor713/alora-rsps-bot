@@ -124,13 +124,27 @@ public class ClientTransformer {
 				try {
 					CtClass cc = cp.get(className);
 
-
-					System.out.println(cc.getName());
-
 					if (cc.getName().equals("MJ")) {
 						for (CtMethod m : cc.getMethods()) {
 							if (m.getName().equals("I") && m.getParameterTypes().length == 1 && m.getParameterTypes()[0].getName().equals("java.lang.String")) {
 								m.insertBefore("{ if (org.iyamjeremy.alorarspsbot.api.Bot.runCommand($1)) { return; } }");
+							}
+						}
+					}
+					
+					if (cc.getName().equals("MG")) {
+						for (CtMethod m : cc.getMethods()) {
+							if (m.getName().equals("I") && m.getParameterTypes().length == 8) {
+								System.out.println("Found it");
+								m.insertBefore("{ System.out.println($1 + \", \" + $2 + \", \" + $3 + \", \" + $4 + \", \" + $5 + \", \" + $6 + \", \" + $7 + \", \" + $8); }");
+							}
+						}
+					}
+					
+					if (cc.getName().equals("FI")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getParameterTypes().length == 11) {
+								m.insertBefore("{ long hash = 0x40000000 | $8 | $9 << 7 | $7 << 14 | $10 << 20; hash |= ((long)$6) << 32; org.iyamjeremy.alorarspsbot.api.Bot.trackGameObject(hash); }");
 							}
 						}
 					}
