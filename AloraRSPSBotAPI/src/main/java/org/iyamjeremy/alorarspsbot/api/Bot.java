@@ -70,11 +70,13 @@ public class Bot {
 			String[] args = command.substring("::".length()).split(" ");
 			String cmdName = args[0];
 			switch (cmdName) {
-				case "abc":
+				case "do_action":
+					int id = Integer.parseInt(args[1]);
+					String option = args[2];
 					for (GameObject gameObject : gameObjects) {
 						if (gameObject.getName() != null && !gameObject.getName().equals("null")) {
-							if (gameObject.getId() == 24101) {
-								gameObject.doAction("Bank");
+							if (gameObject.getId() == id) {
+								gameObject.doAction(option);
 							}
 						}
 					}
