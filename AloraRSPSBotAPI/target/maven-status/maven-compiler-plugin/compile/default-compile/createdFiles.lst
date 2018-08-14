@@ -3,6 +3,7 @@ org/iyamjeremy/alorarspsbot/api/Bot.class
 org/iyamjeremy/alorarspsbot/api/Player.class
 org/iyamjeremy/alorarspsbot/api/Hook.class
 org/iyamjeremy/alorarspsbot/api/NPC.class
+org/iyamjeremy/alorarspsbot/api/RenderLocation.class
 org/iyamjeremy/alorarspsbot/api/Entity.class
 org/iyamjeremy/alorarspsbot/api/BotScript.class
 org/iyamjeremy/alorarspsbot/api/GroundTile.class

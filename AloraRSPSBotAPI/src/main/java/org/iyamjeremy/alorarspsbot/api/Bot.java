@@ -4,6 +4,7 @@ package org.iyamjeremy.alorarspsbot.api;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -11,6 +12,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.awt.Point;
 
 public class Bot {
 	
@@ -31,6 +33,33 @@ public class Bot {
 	private static HashMap<String, List<Object>> trackedInstances = new HashMap<>();
 	
 	private static List<GameObject> gameObjects = new ArrayList<>();
+	
+	private static HashMap<Object, RenderLocation> modelScreenLocations = new HashMap<>();
+	
+	public static void renderModelScreenLocations() {
+		try {
+			Method drawText = Class.forName("NS").getDeclaredMethod("drawText", new Class<?>[]{String.class, int.class, int.class});
+			for (Object model : modelScreenLocations.keySet()) {
+				RenderLocation p = modelScreenLocations.get(model);
+				if (p.getX() > 0 && p.getY() > 0 && p.isActive()) {
+					if (model.getClass().getName().equals("RG")) {
+						drawText.invoke(null, new Object[]{new Player(model).getName() + ": (" + p.getX() + ", " + p.getY() + ")", (int)p.getX(), (int)p.getY()});
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void modelRenderedAt(Object model, int x, int y) {
+		if (!modelScreenLocations.containsKey(model)) {
+			modelScreenLocations.put(model, new RenderLocation(x, y));
+		}
+		else {
+			modelScreenLocations.get(model).setLocation(x, y);
+		}
+	}
 	
 	public static void trackInstance(String className, Object instance) {
 		if (!trackedInstances.containsKey(className)) {
@@ -70,6 +99,36 @@ public class Bot {
 			String[] args = command.substring("::".length()).split(" ");
 			String cmdName = args[0];
 			switch (cmdName) {
+				case "models":
+					for (Object model : modelScreenLocations.keySet()) {
+						System.out.println(modelScreenLocations.get(model));
+					}
+					break;
+				case "pp":
+					try {
+						Class<?> clazz = Class.forName("HE");
+						//Field nameField = clazz.getDeclaredField("I");
+						Field xField = clazz.getDeclaredField("J");
+						xField.setAccessible(true);
+						Field yField = clazz.getDeclaredField("S");
+						yField.setAccessible(true);
+						if (trackedInstances.containsKey("HE")) {
+							for (Object obj : trackedInstances.get("HE")) {
+								//String name = (String)nameField.get(obj);
+								int x = (int)xField.get(obj);
+								int y = (int)yField.get(obj);
+								System.out.println("(" + x + ", " + y + ")");
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					break;
+				case "bank_item":
+					int invSlot = 5;
+					Object[] methodArgs = new Object[]{invSlot, 983040, 25, Integer.parseInt(args[1]), "<col=ff9040>Iron ore", "Store 1", 622, 269};
+					Bot.util.callMethod("DO_ACTION_CLASS", "DO_ACTION_METHOD", new Class<?>[]{int.class, int.class, int.class, long.class, String.class, String.class, int.class, int.class}, null, methodArgs);
+					break;
 				case "do_action":
 					int id = Integer.parseInt(args[1]);
 					String option = args[2];

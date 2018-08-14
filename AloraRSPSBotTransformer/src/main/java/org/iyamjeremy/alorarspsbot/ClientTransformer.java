@@ -135,7 +135,6 @@ public class ClientTransformer {
 					if (cc.getName().equals("MG")) {
 						for (CtMethod m : cc.getMethods()) {
 							if (m.getName().equals("I") && m.getParameterTypes().length == 8) {
-								System.out.println("Found it");
 								m.insertBefore("{ System.out.println($1 + \", \" + $2 + \", \" + $3 + \", \" + $4 + \", \" + $5 + \", \" + $6 + \", \" + $7 + \", \" + $8); }");
 							}
 						}
@@ -156,6 +155,45 @@ public class ClientTransformer {
 					if (cc.getName().equals("KA")) {
 						CtMethod m = cc.getDeclaredMethod("Z", new CtClass[]{CtClass.intType, CtClass.intType, CtClass.intType, CtClass.intType});
 						m.insertBefore("{ System.out.println(\"Drew line\"); }");
+					}
+					
+					if (cc.getName().equals("NS")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getName().equals("renderGroundItemNames")) {
+								m.insertBefore("{ org.iyamjeremy.alorarspsbot.api.Bot.renderModelScreenLocations(); }");
+							}
+						}
+						cc.addMethod(CtMethod.make("public static void drawText(String s, int x, int y) { int i4 = 0; getRegularFont().I(s, x, y, i4 > 50000 ? 15031257 : 16449535, 0); }", cc));
+					}
+					
+					if (cc.getName().equals("QA")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getName().equals("render")) {
+								System.out.println("Added hook");
+								m.insertBefore("{ EZ.I = true; }");
+								m.insertAfter("{ int id = this.method1871(); System.out.println(id); org.iyamjeremy.alorarspsbot.api.Bot.modelRenderedAt((Object)this, EZ.Z, EZ.C); }");
+							}
+						}
+					}
+					
+					/*if (cc.getName().equals("HE")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getName().equals("render")) {
+								System.out.println("Added hook");
+								m.insertBefore("{ EZ.I = true; }");
+								m.insertAfter("{ int id = this.method1871(); System.out.println(id); org.iyamjeremy.alorarspsbot.api.Bot.modelRenderedAt((Object)this, EZ.Z, EZ.C); }");
+							}
+						}
+					}*/
+					
+					if (cc.getName().equals("RG")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getName().equals("render")) {
+								System.out.println("Added hook");
+								m.insertBefore("{ EZ.I = true; }");
+								m.insertAfter("{ int id = this.method1871(); org.iyamjeremy.alorarspsbot.api.Bot.modelRenderedAt((Object)this, EZ.Z, EZ.C); }");
+							}
+						}
 					}
 
 					byte[] bytes = cc.toBytecode();
