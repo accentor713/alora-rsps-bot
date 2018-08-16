@@ -22,7 +22,6 @@ import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
-import javassist.CtField;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
@@ -160,9 +159,9 @@ public class ClientTransformer {
 					if (cc.getName().equals("NS")) {
 						for (CtMethod m : cc.getDeclaredMethods()) {
 							if (m.getName().equals("renderGroundItemNames")) {
-								m.insertBefore("{ org.iyamjeremy.alorarspsbot.api.Bot.renderModelScreenLocations(); }");
-							}
+								m.insertBefore("{ org.iyamjeremy.alorarspsbot.api.Bot.renderUI(); }");							}
 						}
+						cc.addMethod(CtMethod.make("public static void fillRect(int x, int y, int width, int height, int color, int opacity) { if (TA.J) { KA.C(x, y, width, height, color, opacity); } else { LA.I(x, y, width, height, color, opacity); } }", cc));
 						cc.addMethod(CtMethod.make("public static void drawText(String s, int x, int y) { int i4 = 0; getRegularFont().I(s, x, y, i4 > 50000 ? 15031257 : 16449535, 0); }", cc));
 					}
 					
@@ -171,10 +170,27 @@ public class ClientTransformer {
 							if (m.getName().equals("render")) {
 								System.out.println("Added hook");
 								m.insertBefore("{ EZ.I = true; }");
-								m.insertAfter("{ int id = this.method1871(); System.out.println(id); org.iyamjeremy.alorarspsbot.api.Bot.modelRenderedAt((Object)this, EZ.Z, EZ.C); }");
+								m.insertAfter("{ int id = this.method1871(); System.out.println(id); org.iyamjeremy.alorarspsbot.api.Bot.modelRenderedAt((Object)this, EZ.Z, EZ.C); }");							}
+						}
+					}
+					
+					if (cc.getName().equals("ZG")) {
+						for (CtMethod m : cc.getDeclaredMethods()) {
+							if (m.getName().equals("mousePressed")) {
+								m.insertBefore("{ if (org.iyamjeremy.alorarspsbot.api.ui.UI.onMousePressed($1.getX(), $1.getY())) { return; } }");
+							}
+							if (m.getName().equals("mouseReleased")) {
+								m.insertBefore("{ org.iyamjeremy.alorarspsbot.api.ui.UI.onMouseReleased($1.getX(), $1.getY()); }");
+							}
+							if (m.getName().equals("mouseMoved")) {
+								m.insertBefore("{ if (org.iyamjeremy.alorarspsbot.api.ui.UI.onMouseMoved($1.getX(), $1.getY())) { return; } }");
 							}
 						}
 					}
+					
+					/*if (cc.getName().equals("VF")) {
+						cc.getDeclaredMethod("add").insertBefore("{ if (TA.J) { KA.C(100, 25, 160, 36, 0, 100); } else { LA.I(100, 25, 160, 36, 0xFF0000, 255); } }");
+					}*/
 					
 					/*if (cc.getName().equals("HE")) {
 						for (CtMethod m : cc.getDeclaredMethods()) {

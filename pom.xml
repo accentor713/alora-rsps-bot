@@ -18,9 +18,9 @@
   </modules>
 	<dependencies>
 		<dependency>
-			<groupId>javassist</groupId>
+			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>4.0.0</version>
+			<version>3.23.1-GA</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

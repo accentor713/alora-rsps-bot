@@ -12,7 +12,11 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.awt.Point;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import org.iyamjeremy.alorarspsbot.api.ui.Button;
+import org.iyamjeremy.alorarspsbot.api.ui.UI;
 
 public class Bot {
 	
@@ -37,19 +41,84 @@ public class Bot {
 	private static HashMap<Object, RenderLocation> modelScreenLocations = new HashMap<>();
 	
 	public static void renderModelScreenLocations() {
-		try {
-			Method drawText = Class.forName("NS").getDeclaredMethod("drawText", new Class<?>[]{String.class, int.class, int.class});
-			for (Object model : modelScreenLocations.keySet()) {
+		for (Object model : modelScreenLocations.keySet()) {
 				RenderLocation p = modelScreenLocations.get(model);
 				if (p.getX() > 0 && p.getY() > 0 && p.isActive()) {
 					if (model.getClass().getName().equals("RG")) {
-						drawText.invoke(null, new Object[]{new Player(model).getName() + ": (" + p.getX() + ", " + p.getY() + ")", (int)p.getX(), (int)p.getY()});
+						Player player = new Player(model);
+						double hpPercentage = ((double)player.getHP()) / player.getMaxHP();
+						fillRect(p.getX() + (int)(50*(hpPercentage)), p.getY(), (int)(50*(1.0 - hpPercentage)), 5, 0xFF0000, 255);
+						fillRect(p.getX(), p.getY(), (int)(50*(hpPercentage)), 5, 0x00FF00, 255);
+						drawText(player.getName() + ": (" + p.getX() + ", " + p.getY() + ")", p.getX(), p.getY());
 					}
 				}
 			}
-		} catch (Exception e) {
+	}
+	
+	public static void fillRect(int x, int y, int width, int height, int color, int opacity) {
+		try {
+			Class.forName("NS").getDeclaredMethod("fillRect", new Class<?>[]{int.class, int.class, int.class, int.class, int.class, int.class}).invoke(null, new Object[]{x, y, width, height, color, opacity});
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void drawText(String s, int x, int y) {
+		try {
+			Class.forName("NS").getDeclaredMethod("drawText", new Class<?>[]{String.class, int.class, int.class}).invoke(null, new Object[]{s, x, y});
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static boolean minimizedUI = true;
+	private static Button btn = new Button("Bank", () -> gameObjects.forEach(gameObject -> {if (gameObject.getName().equals("Bank booth")) { gameObject.doAction("Bank"); }}), 35);
+	
+	public static void toggleMinimizedUI() {
+		if (minimizedUI) {
+			System.out.println("HHH");
+			btn.setPosition(300, 50);
+			UI.add(btn);
+		}
+		else {
+			UI.remove(btn);
+		}
+		minimizedUI = !minimizedUI;
+	}
+	
+	private static boolean initted = false;
+	
+	public static void renderUI() {
+		renderModelScreenLocations();
+		
+		if (!initted) {
+			Button button = new Button("Show/Hide", () -> toggleMinimizedUI(), 65);
+			button.setPosition(50, 300);
+			UI.add(button);
+			initted = true;
+		}
+		
+		UI.draw();
+		
+/*		if (minimizedUI) {
+			fillRect(0, 0, 10, 10, 0x0000FF, 255);
+			drawText("+", 0, 10);
+		}
+		else {
+			fillRect(0, 0, 100, 300, 0x0055FF, 150);
+			drawText("-", 0, 10);
+			fillRect(20, 20, 20, 20, 0xFF0000, 130);
+			fillRect(50, 260, 40, 20, 0x0055FF, 150);
+		}*/
+		/*for (int i = 0; i < 10; i++) {
+			fillRect(i*25, 0, 10, 10, 0xFF0000 + 0xF*i, 255);
+		}*/
+		
+		fillRect(100, 100, 60, 20, 0x00CCFF, 175);
+		drawText("Hello", 105, 112);
+
 	}
 	
 	public static void modelRenderedAt(Object model, int x, int y) {
@@ -99,31 +168,6 @@ public class Bot {
 			String[] args = command.substring("::".length()).split(" ");
 			String cmdName = args[0];
 			switch (cmdName) {
-				case "models":
-					for (Object model : modelScreenLocations.keySet()) {
-						System.out.println(modelScreenLocations.get(model));
-					}
-					break;
-				case "pp":
-					try {
-						Class<?> clazz = Class.forName("HE");
-						//Field nameField = clazz.getDeclaredField("I");
-						Field xField = clazz.getDeclaredField("J");
-						xField.setAccessible(true);
-						Field yField = clazz.getDeclaredField("S");
-						yField.setAccessible(true);
-						if (trackedInstances.containsKey("HE")) {
-							for (Object obj : trackedInstances.get("HE")) {
-								//String name = (String)nameField.get(obj);
-								int x = (int)xField.get(obj);
-								int y = (int)yField.get(obj);
-								System.out.println("(" + x + ", " + y + ")");
-							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-					break;
 				case "bank_item":
 					int invSlot = 5;
 					Object[] methodArgs = new Object[]{invSlot, 983040, 25, Integer.parseInt(args[1]), "<col=ff9040>Iron ore", "Store 1", 622, 269};
