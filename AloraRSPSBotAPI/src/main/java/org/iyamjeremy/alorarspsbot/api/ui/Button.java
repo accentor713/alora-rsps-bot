@@ -5,18 +5,20 @@ public class Button extends UIElement {
 	
 	private String text;
 	private Runnable clickHandler;
-	private int width;
 	
 	public Button(String text, Runnable clickHandler, int width) {
 		this.text = text;
 		this.clickHandler = clickHandler;
-		this.width = width;
 		this.setDimensions(width, 20);
+	}
+	
+	public void setText(String s) {
+		this.text = s;
 	}
 
 	@Override
 	protected void drawSelf() {
-		UIUtil.fillRect(0, 0, width, 20, 0x000000, 255);
+		UIUtil.fillRect(0, 0, getWidth(), getHeight(), 0x000000, 255);
 		int color = 0x9D7E4B;
 		if (isMouseDown()) {
 			color = 0x5E4213;
@@ -24,7 +26,7 @@ public class Button extends UIElement {
 		else if (isMouseOver()) {
 			color = 0x80612D;
 		}
-		UIUtil.fillRect(2, 2, width-4, 16, color, 255);
+		UIUtil.fillRect(2, 2, getWidth()-4, getHeight()-4, color, 255);
 		UIUtil.drawText(text, 4, 14);
 	}
 

@@ -16,7 +16,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 import org.iyamjeremy.alorarspsbot.api.ui.Button;
+import org.iyamjeremy.alorarspsbot.api.ui.Checkbox;
+import org.iyamjeremy.alorarspsbot.api.ui.Container;
 import org.iyamjeremy.alorarspsbot.api.ui.UI;
+import org.iyamjeremy.alorarspsbot.api.ui.UIUtil;
 
 public class Bot {
 	
@@ -41,11 +44,12 @@ public class Bot {
 	private static HashMap<Object, RenderLocation> modelScreenLocations = new HashMap<>();
 	
 	public static void renderModelScreenLocations() {
-		for (Object model : modelScreenLocations.keySet()) {
-				RenderLocation p = modelScreenLocations.get(model);
+		for (Player player : getPlayers()) {
+			Object playerObj = player.getInstance();
+			if (modelScreenLocations.containsKey(playerObj)) {
+				RenderLocation p = modelScreenLocations.get(playerObj);
 				if (p.getX() > 0 && p.getY() > 0 && p.isActive()) {
-					if (model.getClass().getName().equals("RG")) {
-						Player player = new Player(model);
+					if (playerObj.getClass().getName().equals("RG")) {
 						double hpPercentage = ((double)player.getHP()) / player.getMaxHP();
 						fillRect(p.getX() + (int)(50*(hpPercentage)), p.getY(), (int)(50*(1.0 - hpPercentage)), 5, 0xFF0000, 255);
 						fillRect(p.getX(), p.getY(), (int)(50*(hpPercentage)), 5, 0x00FF00, 255);
@@ -53,6 +57,7 @@ public class Bot {
 					}
 				}
 			}
+		}
 	}
 	
 	public static void fillRect(int x, int y, int width, int height, int color, int opacity) {
@@ -78,7 +83,6 @@ public class Bot {
 	
 	public static void toggleMinimizedUI() {
 		if (minimizedUI) {
-			System.out.println("HHH");
 			btn.setPosition(300, 50);
 			UI.add(btn);
 		}
@@ -90,34 +94,70 @@ public class Bot {
 	
 	private static boolean initted = false;
 	
+	private static Button maximizeButton;
+	
+	private static boolean isIdle = true;
+	
+	public static void bringClientWindowToFront() {
+		JFrame frame = (JFrame) Bot.util.getField("MAIN_CLASS", "CLIENT_JFRAME", null);
+		java.awt.EventQueue.invokeLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	frame.setVisible(true);
+		    	int state = frame.getExtendedState();
+		    	state &= ~JFrame.ICONIFIED;
+		    	frame.setExtendedState(state);
+		    	frame.setAlwaysOnTop(true);
+		    	frame.toFront();
+		    	frame.requestFocus();
+		    	frame.setAlwaysOnTop(false);
+		    }
+		});
+	}
+	
 	public static void renderUI() {
 		renderModelScreenLocations();
 		
+		if (Settings.get(IdleNotifier.SETTING_NAME)) {
+			if (isIdle != IdleNotifier.isIdle()) {
+				if (IdleNotifier.isIdle()) {
+					bringClientWindowToFront();
+				}
+				System.out.println("is " + (!IdleNotifier.isIdle() ? "not " : "") + "idle");
+			}
+			isIdle = IdleNotifier.isIdle();
+			IdleNotifier.tick();
+			UIUtil.drawText("Animation: " + Bot.getLocalPlayer().getAnimation(), 500, 300);
+		}
+		
 		if (!initted) {
+			Container container = new Container(150, 400, true);
+			container.setPosition(0, 0);
+			
 			Button button = new Button("Show/Hide", () -> toggleMinimizedUI(), 65);
-			button.setPosition(50, 300);
-			UI.add(button);
+			container.addChild(button);
+			button.setPosition(30, 30);
+			
+			Checkbox testCheckbox = new Checkbox("Idle Notifier", false, (checked) -> Settings.set(IdleNotifier.SETTING_NAME, true));
+			container.addChild(testCheckbox);
+			testCheckbox.setPosition(10, 300);
+			
+			maximizeButton = new Button("+", () -> {
+				UI.remove(maximizeButton);
+				UI.add(container);
+			}, 16);
+			maximizeButton.setPosition(0, 0);
+			
+			Button minimizeButton = new Button("-", () -> {
+				UI.remove(container);
+				UI.add(maximizeButton);
+			}, 16);
+			container.addChild(minimizeButton);
+			UI.add(container);
 			initted = true;
 		}
 		
 		UI.draw();
-		
-/*		if (minimizedUI) {
-			fillRect(0, 0, 10, 10, 0x0000FF, 255);
-			drawText("+", 0, 10);
-		}
-		else {
-			fillRect(0, 0, 100, 300, 0x0055FF, 150);
-			drawText("-", 0, 10);
-			fillRect(20, 20, 20, 20, 0xFF0000, 130);
-			fillRect(50, 260, 40, 20, 0x0055FF, 150);
-		}*/
-		/*for (int i = 0; i < 10; i++) {
-			fillRect(i*25, 0, 10, 10, 0xFF0000 + 0xF*i, 255);
-		}*/
-		
-		fillRect(100, 100, 60, 20, 0x00CCFF, 175);
-		drawText("Hello", 105, 112);
 
 	}
 	
@@ -354,6 +394,20 @@ public class Bot {
 			botThread = null;
 			currentScript = null;
 		}
+	}
+	
+	public static Player[] getPlayers() {
+		Object[] localPlayerArray = (Object[]) Bot.util.getField("PLAYER_ARRAY_CLASS", "PLAYER_ARRAY_FIELD", null);
+		List<Player> players = new ArrayList<>();
+		
+		for (Object obj : localPlayerArray) {
+			if (obj != null) {
+				Player player = new Player(obj);
+				players.add(player);
+			}
+		}
+		
+		return players.toArray(new Player[players.size()]);
 	}
 	
 	public static NPC[] getNPCs() {

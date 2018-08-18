@@ -20,18 +20,31 @@ public abstract class UIElement {
 	public void removeChild(UIElement element) {
 		element.setParent(null);
 		this.children.remove(element);
+		UI.remove(element);
+	}
+	
+	public List<UIElement> getChildren() {
+		return children;
 	}
 	
 	public void setParent(UIElement parent) {
 		this.parent = parent;
 	}
 	
-	public int getX() {
-		return ((this.parent != null) ? this.parent.getX() : 0) + this.x;
+	public int getAbsoluteX() {
+		return ((this.parent != null) ? this.parent.getAbsoluteX() : 0) + this.x;
 	}
 	
-	public int getY() {
-		return ((this.parent != null) ? this.parent.getX() : 0) + this.y;
+	public int getAbsoluteY() {
+		return ((this.parent != null) ? this.parent.getAbsoluteY() : 0) + this.y;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public int getHeight() {
+		return height;
 	}
 	
 	public boolean isMouseDown() {
@@ -43,10 +56,10 @@ public abstract class UIElement {
 	}
 	
 	public boolean contains(int x, int y) {
-		int thisX = this.getX();
-		int thisY = this.getY();
+		int thisX = this.getAbsoluteX();
+		int thisY = this.getAbsoluteY();
 		return (thisX <= x && thisY <= y &&
-				x <= thisX + width && y <= thisY + height);
+				x <= thisX + getWidth() && y <= thisY + getHeight());
 	}
 	
 	public void setPosition(int x, int y) {
@@ -84,6 +97,10 @@ public abstract class UIElement {
 			child.draw();
 		}
 		UIUtil.translateBy(-this.x, -this.y);
+	}
+
+	public boolean isTopLevelElement() {
+		return parent == null;
 	}
 
 }
